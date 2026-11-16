@@ -5,6 +5,7 @@ Workflows and demo data from the WIT-K AI Masterclass live build session, held o
 We took a small grocery wholesaler in Nairobi that runs on a notebook and an Excel sheet, and automated its sales, purchases, inventory, payments and reporting. Then we added an AI agent that takes customer orders in English or Swahili.
 
 **Watch the session here**
+
 https://drive.google.com/file/d/1tUwVaMsS6Si365K_GPpynAHk5OqNgKf_/view?usp=sharing
 
 **What's in this repository**
