@@ -1,0 +1,396 @@
+{
+  "name": "W13 · AI · Order agent",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W13 · AI order agent\nChat agent: matches free text to real products and Price Today, reads the order back, and only after the customer says yes calls W1.\n\n**After importing W1:** open *Place order* and pick W1. Open the chat to test.",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "d4cb74cd-0ab2-5012-a55b-0127718413c8",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "hostedChat",
+        "initialMessages": "Habari! I can take your order. What would you like today?",
+        "options": {}
+      },
+      "id": "84410cd5-abab-5217-919e-b98374f54e7d",
+      "name": "Chat",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "3c20b94d-5391-55d4-97dc-b982b3f64eb9"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You take orders by chat for a small grocery wholesaler in Nairobi. Today is {{ $now.toFormat('d LLLL yyyy') }}.\nReply in the customer's language (English or Swahili). Keep replies short and friendly.\n\nTo take an order:\n1. Ask for the customer's phone number. Use \"Find customer\" to greet them by name. If they are new, ask for their name.\n2. Use \"Products\" to match what they ask for to exact product names. Offer only products from that list. Quote Price Today in KES.\n3. If Stock Status is Out, or Stock On Hand is less than the quantity, say so and suggest an alternative.\n4. Read the order back: each product, quantity, price and the total. Ask: \"Shall I place the order?\"\n5. Only after the customer says yes, call \"Place order\". Then give the order number, total and status. If the status is New, say the shop will confirm shortly.\n\nRules:\n- Never invent products, prices or discounts.\n- You cannot take payments. Customers pay by M-Pesa, cash or bank.\n- Use \"Order status\" when a customer asks about an existing order."
+        }
+      },
+      "id": "eecb8fbf-3680-5f8a-9dee-756db4c63edd",
+      "name": "Order agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "963fd9f8-8456-555b-90c7-9fa05757a469",
+      "name": "Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        260,
+        360
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "id": "f3b6cede-3b5c-5a7a-9dc9-33881f1f7f15",
+      "name": "Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        520,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblh1ZhFAkRLKwQWE",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblh1ZhFAkRLKwQWE"
+        },
+        "descriptionType": "manual",
+        "toolDescription": "Lists every product we sell, with Price Today (KES) and stock. Use it to match what the customer asks for to exact product names and prices.",
+        "filterByFormula": "{Active}",
+        "options": {
+          "fields": [
+            "Name",
+            "Price Today",
+            "Stock Status",
+            "Stock On Hand",
+            "Category"
+          ]
+        }
+      },
+      "id": "83169e03-8683-5e6a-841b-897ccdc13eaa",
+      "name": "Products",
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        780,
+        360
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblkQrQ2tI528GCQH",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblkQrQ2tI528GCQH"
+        },
+        "descriptionType": "manual",
+        "toolDescription": "Finds a customer by phone number and returns their name.",
+        "filterByFormula": "=RIGHT(REGEX_REPLACE({Phone}, '[^0-9]', ''), 9) = RIGHT(REGEX_REPLACE('{{ $fromAI('phone', 'The customer phone number', 'string') }}', '[^0-9]', ''), 9)",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "id": "8b652465-6dff-5b19-b942-10b462ac0b05",
+      "name": "Find customer",
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        360
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Creates the order. Call it only after the customer has confirmed the items and the total. Returns the order number, total and status.",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "W1 · Sales · Create order"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "customer_phone": "={{ $fromAI('customer_phone', 'The customer phone number', 'string') }}",
+            "customer_name": "={{ $fromAI('customer_name', 'The customer name, or empty if already known', 'string') }}",
+            "channel": "Chatbot",
+            "notes": "={{ $fromAI('notes', 'The order in the customer own words', 'string') }}",
+            "items": "={{ $fromAI('items', 'JSON list of objects: {\"product\": exact product Name from the Products tool, \"quantity\": number}', 'json') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "customer_phone",
+              "displayName": "customer_phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "channel",
+              "displayName": "channel",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "items",
+              "displayName": "items",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "id": "995cd4ba-ffe6-54be-a6af-d7b717af40dc",
+      "name": "Place order",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1300,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "descriptionType": "manual",
+        "toolDescription": "Looks up an order by its number: status, total and balance.",
+        "filterByFormula": "={Order No} = '{{ $fromAI('order_no', 'Order number, for example SO-1012', 'string') }}'",
+        "returnAll": false,
+        "limit": 1,
+        "options": {
+          "fields": [
+            "Order No",
+            "Status",
+            "Order Total",
+            "Balance",
+            "Payment Status"
+          ]
+        }
+      },
+      "id": "6f297f30-b2c2-5095-b784-5e283e817d47",
+      "name": "Order status",
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        1560,
+        360
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Chat": {
+      "main": [
+        [
+          {
+            "node": "Order agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Order agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Order agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Products": {
+      "ai_tool": [
+        [
+          {
+            "node": "Order agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find customer": {
+      "ai_tool": [
+        [
+          {
+            "node": "Order agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Place order": {
+      "ai_tool": [
+        [
+          {
+            "node": "Order agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Order status": {
+      "ai_tool": [
+        [
+          {
+            "node": "Order agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}

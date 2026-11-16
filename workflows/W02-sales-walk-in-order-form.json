@@ -1,0 +1,316 @@
+{
+  "name": "W2 · Sales · Walk-in order form",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W2 · Walk-in order form\nPage 1: phone and name. Page 2: tick in-stock products. Page 3: a quantity per product. Then W1 creates the order, and the last page shows the result.\n\n**After importing W1:** open *Create order* and pick W1 from the list.",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "6a203785-cb37-568b-bcb7-850158192d2b",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Walk-in order",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Phone",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Name",
+              "placeholder": "Only for new customers"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b87d0e65-009e-564f-a7a3-841ebfd4ec86",
+      "name": "Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "fc964684-2a1e-5dfb-8efc-eba7a6ab3721"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblh1ZhFAkRLKwQWE",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblh1ZhFAkRLKwQWE"
+        },
+        "filterByFormula": "AND({Active}, {Stock On Hand} > 0)",
+        "sort": {
+          "property": [
+            {
+              "field": "Name",
+              "direction": "asc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b33a3950-f0ae-51ea-809f-a533e0b9fdc2",
+      "name": "In-stock products",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "products",
+        "options": {}
+      },
+      "id": "daf831e8-d5e0-5e18-918c-67145f542a5f",
+      "name": "One list",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{ JSON.stringify([\n  { \"fieldLabel\": \"Products\", \"fieldType\": \"checkbox\", \"requiredField\": true,\n    \"fieldOptions\": { \"values\": $json.products.map(p => ({ \"option\": p.Name })) } }\n]) }}",
+        "options": {}
+      },
+      "id": "79c8e352-57f4-5b71-a02b-e9b600656014",
+      "name": "Pick products",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        780,
+        0
+      ],
+      "webhookId": "51c57047-c243-5e15-8115-d401b2413ab7"
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{ JSON.stringify($json.Products.map(name => ({ \"fieldLabel\": name, \"fieldType\": \"number\", \"requiredField\": true }))) }}",
+        "options": {}
+      },
+      "id": "e69f693f-0242-5b69-a37a-096ef0e9af47",
+      "name": "Quantities",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        0
+      ],
+      "webhookId": "2a16c9b6-9e6a-508d-80fb-500e8438aa6b"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "W1 · Sales · Create order"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "customer_phone": "={{ $('Form').first().json.Phone }}",
+            "customer_name": "={{ $('Form').first().json.Name }}",
+            "channel": "Walk-in",
+            "notes": "Walk-in order (form)",
+            "items": "={{ $('Pick products').first().json.Products.map(name => ({ \"product\": name, \"quantity\": $json[name] })) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "customer_phone",
+              "displayName": "customer_phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "channel",
+              "displayName": "channel",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "items",
+              "displayName": "items",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "0170a85e-ce25-5dac-897e-173a25e578e5",
+      "name": "Create order",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Order received",
+        "completionMessage": "={{ $json.message }}",
+        "options": {}
+      },
+      "id": "ab7a9c85-e7dc-51ab-b387-5a24bd47d0f5",
+      "name": "Done",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        0
+      ],
+      "webhookId": "3bbff460-e2e4-5b54-9aac-817d10322bdb"
+    }
+  ],
+  "connections": {
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "In-stock products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "In-stock products": {
+      "main": [
+        [
+          {
+            "node": "One list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One list": {
+      "main": [
+        [
+          {
+            "node": "Pick products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick products": {
+      "main": [
+        [
+          {
+            "node": "Quantities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quantities": {
+      "main": [
+        [
+          {
+            "node": "Create order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create order": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}

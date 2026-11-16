@@ -1,0 +1,532 @@
+{
+  "name": "W7 · Purchases · Approve and send PO",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W7 · Approve and send PO\nAirtable button **Approve & send** on a Draft PO → email the supplier a table of the lines → Status = Sent, Expected Date = today + lead time.\n\n**Before testing:** set the supplier's Email in Airtable to your own.",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "9fcbde0f-7a01-5ab2-afe1-73d111eb32cc",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "send-po",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "fb520593-740e-526b-ab67-1af2f65edba2",
+      "name": "Button",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "544dc57d-a3b1-5def-8810-c770a78177fd"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliSyMvnUzRPNUI8",
+          "mode": "list",
+          "cachedResultName": "Purchase Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tbliSyMvnUzRPNUI8"
+        },
+        "id": "={{ $json.query.po_id }}",
+        "options": {}
+      },
+      "id": "2bf07452-27dc-555d-a6c8-2f0493c30c81",
+      "name": "Get PO",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1257c4b0-5421-59c7-8475-549de70ce79c",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Draft",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "de4340fb-62ed-5d46-9524-6edc7ae6727c",
+      "name": "Is it Draft?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "656220c6-08e4-52ff-8d5b-6aa25b52649c",
+              "name": "message",
+              "value": "={{ $json['PO No'] }} is already {{ $json.Status }}.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "80e8c441-1898-5d4a-af33-e389ccdc6b0e",
+      "name": "Not draft",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        780,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblD7Rr0vnZ69XlmY",
+          "mode": "list",
+          "cachedResultName": "Suppliers",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblD7Rr0vnZ69XlmY"
+        },
+        "id": "={{ $json.Supplier[0] }}",
+        "options": {}
+      },
+      "id": "c4e96d06-fde1-5aad-9d48-17746dc40c94",
+      "name": "Supplier",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        780,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltleDjW1hFDq3Eq",
+          "mode": "list",
+          "cachedResultName": "Purchase Order Lines",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tbltleDjW1hFDq3Eq"
+        },
+        "filterByFormula": "=ARRAYJOIN({Purchase Order}) = '{{ $('Get PO').first().json['PO No'] }}'",
+        "options": {}
+      },
+      "id": "8d1d28a3-1a47-5a32-9f57-53cb9f375543",
+      "name": "PO lines",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2971e4d5-7b5c-5d6a-b3e0-a1d9fdd1a5a4",
+              "name": "Product",
+              "value": "={{ $json['Product Name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "ff9959e3-7e3e-5523-8219-1d754ad1dfee",
+              "name": "Quantity",
+              "value": "={{ $json.Quantity }}",
+              "type": "number"
+            },
+            {
+              "id": "1476b8e2-f374-568c-aadb-187e93080811",
+              "name": "Unit cost (KES)",
+              "value": "={{ $json['Unit Cost'] }}",
+              "type": "number"
+            },
+            {
+              "id": "6828727d-5aa4-5f07-9911-f0391bc95fe7",
+              "name": "Total (KES)",
+              "value": "={{ $json['Line Total'] }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5cbfe0dd-6e0a-5e59-932f-615a88a5c3a2",
+      "name": "Table rows",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "convertToHtmlTable",
+        "options": {}
+      },
+      "id": "73e9d9a1-bd15-5934-9221-0bc502a19185",
+      "name": "Lines table",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Supplier').first().json.Email }}",
+        "subject": "=Purchase order {{ $('Get PO').first().json['PO No'] }}",
+        "emailType": "html",
+        "message": "=<p>Dear {{ $('Supplier').first().json['Contact Person'] }},</p>\n<p>Please supply the items below by {{ $now.plus($('Supplier').first().json['Lead Time (days)'], 'days').toFormat('d LLLL yyyy') }}.</p>\n{{ $json.table }}\n<p><b>Total: KES {{ $('Get PO').first().json['PO Total'] }}</b></p>\n<p>Thank you.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "1dacbf5a-cc22-564a-952f-d251e9065152",
+      "name": "Email supplier",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1820,
+        0
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": null,
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliSyMvnUzRPNUI8",
+          "mode": "list",
+          "cachedResultName": "Purchase Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tbliSyMvnUzRPNUI8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Get PO').first().json.id }}",
+            "Status": "Sent",
+            "Expected Date": "={{ $now.plus($('Supplier').first().json['Lead Time (days)'], 'days').toFormat('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Expected Date",
+              "displayName": "Expected Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "53014d3b-049e-5bae-8594-d04bfc167551",
+      "name": "Mark sent",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2080,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "65cc9b67-a0ac-55ff-bed6-2e28713f38e7",
+              "name": "message",
+              "value": "={{ $('Get PO').first().json['PO No'] }} sent to {{ $('Supplier').first().json.Name }}.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "87e14850-e87d-51c6-9c2d-79ac9a87e55c",
+      "name": "Sent",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2340,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.message }}",
+        "options": {}
+      },
+      "id": "6db1f29b-4e2b-57f9-9c81-e5019d789534",
+      "name": "Reply",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2600,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Button": {
+      "main": [
+        [
+          {
+            "node": "Get PO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get PO": {
+      "main": [
+        [
+          {
+            "node": "Is it Draft?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is it Draft?": {
+      "main": [
+        [
+          {
+            "node": "Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supplier": {
+      "main": [
+        [
+          {
+            "node": "PO lines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PO lines": {
+      "main": [
+        [
+          {
+            "node": "Table rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Table rows": {
+      "main": [
+        [
+          {
+            "node": "Lines table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lines table": {
+      "main": [
+        [
+          {
+            "node": "Email supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email supplier": {
+      "main": [
+        [
+          {
+            "node": "Mark sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark sent": {
+      "main": [
+        [
+          {
+            "node": "Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sent": {
+      "main": [
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Not draft": {
+      "main": [
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}

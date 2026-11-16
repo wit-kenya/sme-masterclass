@@ -1,0 +1,859 @@
+{
+  "name": "W1 · Sales · Create order",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W1 · Create order\nCalled by W2 (form) and W13 (agent). Finds or adds the customer, numbers the order, creates one line per product with today's price and discount, asks W3 to confirm, returns the result.\n\n**Test:** pinned data on Input → SO-1012 for Mwalimu Duka, total 2,450.\n**After importing W3:** open *Confirm order*, pick W3, and enable the node.",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "623631b3-032a-58e1-84be-c32078877d1a",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"customer_phone\": \"0700 200 308\",\n  \"customer_name\": \"Mwalimu Duka\",\n  \"channel\": \"WhatsApp\",\n  \"notes\": \"Sukari 1kg 10 na unga 5 tafadhali\",\n  \"items\": [\n    {\n      \"product\": \"Sugar 1kg\",\n      \"quantity\": 10\n    },\n    {\n      \"product\": \"Maize Flour 2kg\",\n      \"quantity\": 5\n    }\n  ]\n}"
+      },
+      "id": "9474777b-a7dc-58d2-a704-5b98b029b17a",
+      "name": "Input",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblkQrQ2tI528GCQH",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblkQrQ2tI528GCQH"
+        },
+        "filterByFormula": "=RIGHT(REGEX_REPLACE({Phone}, '[^0-9]', ''), 9) = RIGHT(REGEX_REPLACE('{{ $json.customer_phone }}', '[^0-9]', ''), 9)",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "id": "51dade31-bfb2-5c3a-baac-a953f141b488",
+      "name": "Find customer",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "330de793-1712-5a82-ad0b-6bdfcc43ee47",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6aea7fb4-b15e-548a-a9cf-cab5502746a4",
+      "name": "New customer?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblkQrQ2tI528GCQH",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblkQrQ2tI528GCQH"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Input').first().json.customer_name }}",
+            "Phone": "={{ $('Input').first().json.customer_phone }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "d9080cc6-cf06-566c-8486-bdaa584cf633",
+      "name": "Add customer",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        780,
+        -180
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fb564653-63f8-5672-898d-911ca2df5473",
+              "name": "customer_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3e392502-59b2-54fc-85a3-eaf07d6b308b",
+      "name": "Customer",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "returnAll": false,
+        "limit": 1,
+        "sort": {
+          "property": [
+            {
+              "field": "Order No",
+              "direction": "desc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5ca91425-62ad-5529-aaf4-4caf93421399",
+      "name": "Last order",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1300,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order No": "=SO-{{ Number($json['Order No'].replace('SO-', '')) + 1 }}",
+            "Customer": "={{ [ $('Customer').first().json.customer_id ] }}",
+            "Order Date": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "Channel": "={{ $('Input').first().json.channel }}",
+            "Status": "New",
+            "Notes": "={{ $('Input').first().json.notes }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order No",
+              "displayName": "Order No",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Customer",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Channel",
+              "displayName": "Channel",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "699941ba-e4d5-52b9-bd0d-50f90251fa6e",
+      "name": "Create order",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1560,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5dd668a0-5bb3-5cd3-aa45-eacee67968b1",
+              "name": "order_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "6768bcc5-236b-5f5f-81c7-f3c76089f699",
+              "name": "order_no",
+              "value": "={{ $json['Order No'] }}",
+              "type": "string"
+            },
+            {
+              "id": "4dff75aa-0a32-5973-ac8c-b30fbf79a3b6",
+              "name": "items",
+              "value": "={{ $('Input').first().json.items }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d4ecb93d-472b-5119-b1aa-0298e5c7b200",
+      "name": "Items",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1820,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "69c49da1-e56b-5180-857a-8cbfdd0bfc36",
+      "name": "Split items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblh1ZhFAkRLKwQWE",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblh1ZhFAkRLKwQWE"
+        },
+        "filterByFormula": "={Name} = '{{ $json.product }}'",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "id": "64b7648b-8bd3-53ff-935b-a752772c3002",
+      "name": "Find product",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2340,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblYV4Yt04j2mczf9",
+          "mode": "list",
+          "cachedResultName": "Sales Order Lines",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblYV4Yt04j2mczf9"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Line": "={{ $('Split items').item.json.order_no }} · {{ $json.Name }}",
+            "Sales Order": "={{ [ $('Split items').item.json.order_id ] }}",
+            "Product": "={{ [ $json.id ] }}",
+            "Quantity": "={{ $('Split items').item.json.quantity }}",
+            "Unit Price": "={{ $json['Selling Price'] }}",
+            "Discount %": "={{ $json['Live Discount %'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Line",
+              "displayName": "Line",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Sales Order",
+              "displayName": "Sales Order",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Unit Price",
+              "displayName": "Unit Price",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Discount %",
+              "displayName": "Discount %",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "e7cd57dc-8cea-528a-a397-b80754331ec9",
+      "name": "Create line",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2600,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "W3 · Sales · Confirm order"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ $('Items').first().json.order_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "cf5450ff-e8a9-521e-98e0-b6ff9a300999",
+      "name": "Confirm order",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2860,
+        0
+      ],
+      "executeOnce": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "id": "={{ $('Items').first().json.order_id }}",
+        "options": {}
+      },
+      "id": "b034db05-090f-5c4e-a26a-04068295fbc3",
+      "name": "Get order",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3120,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "84add086-b012-5cea-ba7c-bacb866a0e35",
+              "name": "order_no",
+              "value": "={{ $json['Order No'] }}",
+              "type": "string"
+            },
+            {
+              "id": "5e4c128b-050f-595b-adb6-242cf60583c1",
+              "name": "status",
+              "value": "={{ $json.Status }}",
+              "type": "string"
+            },
+            {
+              "id": "d6b64305-6fa9-5240-b2d5-ea6688656156",
+              "name": "total",
+              "value": "={{ $json['Order Total'] }}",
+              "type": "number"
+            },
+            {
+              "id": "97ec3151-798d-57a1-9978-5be79cd68d98",
+              "name": "message",
+              "value": "=Order {{ $json['Order No'] }} received. Total KES {{ $json['Order Total'] }}. Status: {{ $json.Status }}.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "be16f95b-a0af-5162-b6ee-c9d64c22c134",
+      "name": "Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3380,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Input": {
+      "main": [
+        [
+          {
+            "node": "Find customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find customer": {
+      "main": [
+        [
+          {
+            "node": "New customer?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New customer?": {
+      "main": [
+        [
+          {
+            "node": "Add customer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add customer": {
+      "main": [
+        [
+          {
+            "node": "Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customer": {
+      "main": [
+        [
+          {
+            "node": "Last order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Last order": {
+      "main": [
+        [
+          {
+            "node": "Create order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create order": {
+      "main": [
+        [
+          {
+            "node": "Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Items": {
+      "main": [
+        [
+          {
+            "node": "Split items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split items": {
+      "main": [
+        [
+          {
+            "node": "Find product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find product": {
+      "main": [
+        [
+          {
+            "node": "Create line",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create line": {
+      "main": [
+        [
+          {
+            "node": "Confirm order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm order": {
+      "main": [
+        [
+          {
+            "node": "Get order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get order": {
+      "main": [
+        [
+          {
+            "node": "Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  },
+  "pinData": {
+    "Input": [
+      {
+        "json": {
+          "customer_phone": "0700 200 308",
+          "customer_name": "Mwalimu Duka",
+          "channel": "WhatsApp",
+          "notes": "Sukari 1kg 10 na unga 5 tafadhali",
+          "items": [
+            {
+              "product": "Sugar 1kg",
+              "quantity": 10
+            },
+            {
+              "product": "Maize Flour 2kg",
+              "quantity": 5
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

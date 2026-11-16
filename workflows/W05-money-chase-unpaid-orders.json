@@ -1,0 +1,205 @@
+{
+  "name": "W5 · Money · Chase unpaid orders",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W5 · Chase unpaid orders (session 2)\nEvery day 08:00: email the owner orders with a balance after 3 days.\n\n**Change** the email address in *Email owner* (you@yourmail.com).",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "248a3e55-7c9c-5721-b3df-89d8bfe8337f",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "1a57648d-6b15-5186-b1c8-edbaa11c4ceb",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "filterByFormula": "AND({Balance} > 0, {Status} != 'Cancelled', {Status} != 'New', IS_BEFORE({Order Date}, DATEADD(TODAY(), -3, 'days')))",
+        "options": {}
+      },
+      "id": "de06ad9c-1508-52d6-a789-eae138b4bd29",
+      "name": "Overdue",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50149b23-f1f9-5046-8c7c-48994f97fed8",
+              "name": "Order",
+              "value": "={{ $json['Order No'] }}",
+              "type": "string"
+            },
+            {
+              "id": "a7ab54ba-c862-553f-a8ce-ffc37e282119",
+              "name": "Customer",
+              "value": "={{ $json['Customer Name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "09891d1b-ddad-5e5e-9a03-7409dcfe3086",
+              "name": "Order date",
+              "value": "={{ $json['Order Date'] }}",
+              "type": "string"
+            },
+            {
+              "id": "3f6d1d01-27af-5889-8708-ebf9391883dd",
+              "name": "Balance (KES)",
+              "value": "={{ $json.Balance }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "19303dd5-8c4a-5eb7-a029-f0b058ab530f",
+      "name": "Rows",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "convertToHtmlTable",
+        "options": {}
+      },
+      "id": "701062bc-2a6c-5c54-9a2a-1299eda95e2a",
+      "name": "Table",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@yourmail.com",
+        "subject": "=Unpaid orders to chase · {{ $now.toFormat('d LLL') }}",
+        "emailType": "html",
+        "message": "=<p>These orders still have a balance after 3 days:</p>{{ $json.table }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a314bd98-4a62-59c0-b7fb-e032c64579e3",
+      "name": "Email owner",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        0
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": null,
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Overdue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Overdue": {
+      "main": [
+        [
+          {
+            "node": "Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rows": {
+      "main": [
+        [
+          {
+            "node": "Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Table": {
+      "main": [
+        [
+          {
+            "node": "Email owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}

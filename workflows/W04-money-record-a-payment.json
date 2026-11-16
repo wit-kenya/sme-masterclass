@@ -1,0 +1,541 @@
+{
+  "name": "W4 · Money · Record a payment",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W4 · Record a payment\nPage 1: phone. Page 2: that customer's unpaid orders with balances, then amount, method and reference. Adds a Cash Book row; Airtable updates the balance.\n\n**Test:** phone 0700 200 307 → SO-1007 balance 3635.",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "8c85b464-3195-5e2c-916d-9c88f8ebec7d",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Record a payment",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Phone",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "455ef482-a634-5ca6-a6db-b0357337d765",
+      "name": "Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "80096568-4f01-5747-9a89-80205663a303"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblkQrQ2tI528GCQH",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblkQrQ2tI528GCQH"
+        },
+        "filterByFormula": "=RIGHT(REGEX_REPLACE({Phone}, '[^0-9]', ''), 9) = RIGHT(REGEX_REPLACE('{{ $json.Phone }}', '[^0-9]', ''), 9)",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "id": "8377b1c9-d456-530d-aef8-8b74570c8282",
+      "name": "Find customer",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "filterByFormula": "=AND({Customer Name} = '{{ $json.Name }}', {Balance} > 0, {Status} != 'Cancelled')",
+        "options": {}
+      },
+      "id": "b2003e08-75e8-58ac-bb45-be04d5d57a2e",
+      "name": "Unpaid orders",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "35f795f0-2f87-5ab1-9f3f-f70b63a1bb3a",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "43d70e52-0124-54d1-a40b-162b89c2852d",
+      "name": "Any unpaid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Nothing to pay",
+        "completionMessage": "No unpaid orders for this phone number.",
+        "options": {}
+      },
+      "id": "488c02ca-cd55-5f80-91d1-70dd1efc2826",
+      "name": "Nothing to pay",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        180
+      ],
+      "webhookId": "36c349ad-55c6-59e0-a94a-3c4df5399a8f"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "orders",
+        "options": {}
+      },
+      "id": "4bdc06fb-5960-53db-8b85-d4ff256b175a",
+      "name": "One list",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{ JSON.stringify([\n  { \"fieldLabel\": \"Order\", \"fieldType\": \"dropdown\", \"requiredField\": true,\n    \"fieldOptions\": { \"values\": $json.orders.map(o => ({ \"option\": o['Order No'] + ' · balance KES ' + o.Balance })) } },\n  { \"fieldLabel\": \"Amount\", \"fieldType\": \"number\", \"requiredField\": true },\n  { \"fieldLabel\": \"Method\", \"fieldType\": \"dropdown\", \"requiredField\": true,\n    \"fieldOptions\": { \"values\": [ { \"option\": \"M-Pesa\" }, { \"option\": \"Cash\" }, { \"option\": \"Bank\" } ] } },\n  { \"fieldLabel\": \"Reference\", \"placeholder\": \"M-Pesa code\" }\n]) }}",
+        "options": {}
+      },
+      "id": "8182e86e-4528-5a32-84a2-5702e7a57cc0",
+      "name": "Payment",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        0
+      ],
+      "webhookId": "1d987310-8d66-5f20-8918-f8cbd08f3d3b"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "filterByFormula": "={Order No} = '{{ $json.Order.split(' · ')[0] }}'",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "id": "ad8f81ad-75fb-58f9-b3ba-13f7f9281c3d",
+      "name": "The order",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1560,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzmTcKOL9IAAH6s",
+          "mode": "list",
+          "cachedResultName": "Cash Book",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblzmTcKOL9IAAH6s"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Description": "=Payment for {{ $json['Order No'] }}",
+            "Date": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "Direction": "In",
+            "Category": "Sales",
+            "Amount": "={{ $('Payment').first().json.Amount }}",
+            "Method": "={{ $('Payment').first().json.Method }}",
+            "Reference": "={{ $('Payment').first().json.Reference }}",
+            "Sales Order": "={{ [ $json.id ] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Direction",
+              "displayName": "Direction",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Method",
+              "displayName": "Method",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reference",
+              "displayName": "Reference",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Sales Order",
+              "displayName": "Sales Order",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "12dc7cae-6c03-5330-a63c-2ed4d2e17fc5",
+      "name": "Add payment",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1820,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "id": "={{ $('The order').first().json.id }}",
+        "options": {}
+      },
+      "id": "039f83f7-aeb7-5496-86b5-b213b7fad775",
+      "name": "Updated order",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2080,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Payment recorded",
+        "completionMessage": "=KES {{ $('Payment').first().json.Amount }} recorded for {{ $json['Order No'] }}. Balance now KES {{ $json.Balance }} ({{ $json['Payment Status'] }}).",
+        "options": {}
+      },
+      "id": "cc0f480c-cacf-5bc9-9381-6d8265862552",
+      "name": "Done",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        0
+      ],
+      "webhookId": "5ef6f9c4-cbde-5d60-9cbb-383868953ee4"
+    }
+  ],
+  "connections": {
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "Find customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find customer": {
+      "main": [
+        [
+          {
+            "node": "Unpaid orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unpaid orders": {
+      "main": [
+        [
+          {
+            "node": "Any unpaid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any unpaid?": {
+      "main": [
+        [
+          {
+            "node": "One list",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Nothing to pay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One list": {
+      "main": [
+        [
+          {
+            "node": "Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment": {
+      "main": [
+        [
+          {
+            "node": "The order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "The order": {
+      "main": [
+        [
+          {
+            "node": "Add payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add payment": {
+      "main": [
+        [
+          {
+            "node": "Updated order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Updated order": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}

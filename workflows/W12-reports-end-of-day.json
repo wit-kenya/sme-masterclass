@@ -1,0 +1,559 @@
+{
+  "name": "W12 · Reports · End of day",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W12 · End-of-day report\nEvery day 20:00: one email with today's orders, today's cash, low stock and unpaid orders.\n\n**Change** the email address in *Email owner* (you@yourmail.com).",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "0f30c6bc-ed4d-5437-acba-80f98b4336b2",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 20
+            }
+          ]
+        }
+      },
+      "id": "cba6a430-93c7-5c76-a51b-5bc9a0468ff6",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "filterByFormula": "IS_SAME({Order Date}, TODAY(), 'day')",
+        "options": {}
+      },
+      "id": "c28364a9-af2f-5e96-916b-b62ea4a09cc4",
+      "name": "Today's orders",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "71fae341-fe41-5ecf-87af-f37aff6575ad",
+              "name": "Order",
+              "value": "={{ $json['Order No'] }}",
+              "type": "string"
+            },
+            {
+              "id": "4c444161-69c8-59c6-8d5f-761f7ed1385f",
+              "name": "Customer",
+              "value": "={{ $json['Customer Name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "e2deb813-4161-5b5b-8240-5d974e95f51a",
+              "name": "Channel",
+              "value": "={{ $json.Channel }}",
+              "type": "string"
+            },
+            {
+              "id": "94804fdd-d6e9-57b9-830d-3c3d876a6b15",
+              "name": "Total (KES)",
+              "value": "={{ $json['Order Total'] }}",
+              "type": "number"
+            },
+            {
+              "id": "347f0fc9-8c5f-53fb-9129-f22a6fc6e73c",
+              "name": "Status",
+              "value": "={{ $json.Status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "15de1363-b3ca-567e-9353-43c571f3c946",
+      "name": "Order rows",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "convertToHtmlTable",
+        "options": {}
+      },
+      "id": "001fbe78-f3ec-5e26-95e0-042eadce5ae1",
+      "name": "Orders table",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzmTcKOL9IAAH6s",
+          "mode": "list",
+          "cachedResultName": "Cash Book",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblzmTcKOL9IAAH6s"
+        },
+        "filterByFormula": "IS_SAME({Date}, TODAY(), 'day')",
+        "options": {}
+      },
+      "id": "9bad99d7-8fb2-590e-9829-104d0ec4bf84",
+      "name": "Today's cash",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "sum",
+              "field": "Amount"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "Direction",
+        "options": {}
+      },
+      "id": "137c800c-aa0a-5d1a-a56c-cfb726b8554a",
+      "name": "Cash totals",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        1300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "convertToHtmlTable",
+        "options": {}
+      },
+      "id": "ce362318-b4b5-51c0-8ab4-75ec4f801955",
+      "name": "Cash table",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblh1ZhFAkRLKwQWE",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblh1ZhFAkRLKwQWE"
+        },
+        "filterByFormula": "AND({Active}, {Stock Status} != 'OK')",
+        "options": {}
+      },
+      "id": "8b72ec56-d311-5ff6-abc7-2b2bb628e628",
+      "name": "Low stock",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1820,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "49403715-f8d1-5105-88ed-570bea2fbc18",
+              "name": "Product",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "2c1bd775-f315-5284-ae84-98c5eb98b30c",
+              "name": "Stock",
+              "value": "={{ $json['Stock On Hand'] }}",
+              "type": "number"
+            },
+            {
+              "id": "a66de5b9-dd48-5ca1-bef2-0cdfb517d954",
+              "name": "Status",
+              "value": "={{ $json['Stock Status'] }}",
+              "type": "string"
+            },
+            {
+              "id": "3b53b15f-e38e-5e58-b22c-210b674ac967",
+              "name": "On order",
+              "value": "={{ $json['On Order'] }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "55ad1686-c8bc-52ef-9638-81ab93ffc7fc",
+      "name": "Stock rows",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2080,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "convertToHtmlTable",
+        "options": {}
+      },
+      "id": "64a5b781-dc80-51c0-8f5f-36adcff75ed5",
+      "name": "Stock table",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        2340,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "filterByFormula": "AND({Balance} > 0, {Status} != 'Cancelled')",
+        "options": {}
+      },
+      "id": "56031cf7-7ddf-55b6-b665-7a2ebdec5679",
+      "name": "Unpaid",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2600,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4c386d83-b0fe-540c-b683-223e8c6245a5",
+              "name": "Order",
+              "value": "={{ $json['Order No'] }}",
+              "type": "string"
+            },
+            {
+              "id": "307c8495-9a8f-53a6-be8c-05415995ee76",
+              "name": "Customer",
+              "value": "={{ $json['Customer Name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f0740ba2-18f1-5ea7-8b93-5703160daddc",
+              "name": "Balance (KES)",
+              "value": "={{ $json.Balance }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "62441f5e-d065-5bda-be58-db19ea37c503",
+      "name": "Unpaid rows",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "convertToHtmlTable",
+        "options": {}
+      },
+      "id": "0d3ae7c6-e7d3-56d8-9a92-01f36b13e8b4",
+      "name": "Unpaid table",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        3120,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@yourmail.com",
+        "subject": "=End of day · {{ $now.toFormat('d LLL yyyy') }}",
+        "emailType": "html",
+        "message": "=<h3>Orders today</h3>{{ $('Orders table').first().json.table }}\n<h3>Cash today</h3>{{ $('Cash table').first().json.table }}\n<h3>Low or out of stock</h3>{{ $('Stock table').first().json.table }}\n<h3>Unpaid orders</h3>{{ $('Unpaid table').first().json.table }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "485ee9e5-f606-538f-bbbb-4bac027baa16",
+      "name": "Email owner",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3380,
+        0
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": null,
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Today's orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Today's orders": {
+      "main": [
+        [
+          {
+            "node": "Order rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Order rows": {
+      "main": [
+        [
+          {
+            "node": "Orders table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orders table": {
+      "main": [
+        [
+          {
+            "node": "Today's cash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Today's cash": {
+      "main": [
+        [
+          {
+            "node": "Cash totals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cash totals": {
+      "main": [
+        [
+          {
+            "node": "Cash table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cash table": {
+      "main": [
+        [
+          {
+            "node": "Low stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Low stock": {
+      "main": [
+        [
+          {
+            "node": "Stock rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stock rows": {
+      "main": [
+        [
+          {
+            "node": "Stock table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stock table": {
+      "main": [
+        [
+          {
+            "node": "Unpaid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unpaid": {
+      "main": [
+        [
+          {
+            "node": "Unpaid rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unpaid rows": {
+      "main": [
+        [
+          {
+            "node": "Unpaid table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unpaid table": {
+      "main": [
+        [
+          {
+            "node": "Email owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}

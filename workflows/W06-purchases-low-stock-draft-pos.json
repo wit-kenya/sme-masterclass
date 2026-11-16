@@ -1,0 +1,573 @@
+{
+  "name": "W6 · Purchases · Low stock → draft POs",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W6 · Low stock → draft POs\nEvery day 07:00: active products at or below reorder level with nothing on order → one Draft PO per supplier (qty = Reorder Qty) → email the owner.\n\n**Change** the email address in *Tell the owner* (you@yourmail.com).\n**Test:** PO-2004 and PO-2005 (Sugar 1kg × 54, Cooking Oil 3L × 17).",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "909c37de-ba89-5678-b5d7-07777b2e3b2a",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "f9be39ab-f57f-59e7-a5de-ae0eab8cfe6e",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliSyMvnUzRPNUI8",
+          "mode": "list",
+          "cachedResultName": "Purchase Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tbliSyMvnUzRPNUI8"
+        },
+        "returnAll": false,
+        "limit": 1,
+        "sort": {
+          "property": [
+            {
+              "field": "PO No",
+              "direction": "desc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3c2e7e8b-aa6b-5f95-8ca5-4ad746122d05",
+      "name": "Last PO",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblh1ZhFAkRLKwQWE",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblh1ZhFAkRLKwQWE"
+        },
+        "filterByFormula": "AND({Active}, {Stock On Hand} <= {Reorder Level}, {On Order} = 0)",
+        "options": {}
+      },
+      "id": "4548f0ce-0adb-5b27-a68e-b389d5050425",
+      "name": "Low stock",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e83fd9e6-8c15-5c2e-95cd-b234dbd018f7",
+              "name": "supplier_id",
+              "value": "={{ $json.Supplier[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "7391dd6f-d529-5270-8667-f9580c512091",
+              "name": "product_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "b98498ee-ad99-5ebc-8e1f-2446b839380f",
+              "name": "product",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "3b3dd221-376b-54bd-9ba3-7abb9d2846db",
+              "name": "qty",
+              "value": "={{ $json['Reorder Qty'] }}",
+              "type": "number"
+            },
+            {
+              "id": "7a139056-c4ed-53ee-8f1f-2138ddc0dd44",
+              "name": "unit_cost",
+              "value": "={{ $json['Cost Price'] }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c8b34db2-5668-52bb-8209-79d77f18f319",
+      "name": "Prepare",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "count",
+              "field": "product_id"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "supplier_id",
+        "options": {}
+      },
+      "id": "35a4d7c8-1624-5d64-82e3-29ee4ec8d764",
+      "name": "One per supplier",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliSyMvnUzRPNUI8",
+          "mode": "list",
+          "cachedResultName": "Purchase Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tbliSyMvnUzRPNUI8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "PO No": "=PO-{{ Number($('Last PO').first().json['PO No'].replace('PO-', '')) + $itemIndex + 1 }}",
+            "Supplier": "={{ [ $json.supplier_id ] }}",
+            "Order Date": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "Status": "Draft"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "PO No",
+              "displayName": "PO No",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Supplier",
+              "displayName": "Supplier",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "a72c464e-3e97-55e8-8d5e-818712a5716c",
+      "name": "Create PO",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1300,
+        -180
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dceafb9f-6905-5dae-b731-1abc119e9c7c",
+              "name": "supplier_id",
+              "value": "={{ $json.Supplier[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "64ee8b1a-189d-5625-a612-2fb965e65dc4",
+              "name": "po_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "874e3e39-c6f7-5298-8eac-bc6a3d06c3f7",
+              "name": "po_no",
+              "value": "={{ $json['PO No'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "736bf024-8503-5e53-82a3-0b4bd7dbc62c",
+      "name": "PO ids",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1560,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByFields",
+        "fieldsToMatchString": "supplier_id",
+        "joinMode": "keepMatches",
+        "outputDataFrom": "both",
+        "options": {}
+      },
+      "id": "606dd91c-303a-51bc-b538-2062057bce26",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1820,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltleDjW1hFDq3Eq",
+          "mode": "list",
+          "cachedResultName": "Purchase Order Lines",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tbltleDjW1hFDq3Eq"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Line": "={{ $json.po_no }} · {{ $json.product }}",
+            "Purchase Order": "={{ [ $json.po_id ] }}",
+            "Product": "={{ [ $json.product_id ] }}",
+            "Quantity": "={{ $json.qty }}",
+            "Unit Cost": "={{ $json.unit_cost }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Line",
+              "displayName": "Line",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Purchase Order",
+              "displayName": "Purchase Order",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Unit Cost",
+              "displayName": "Unit Cost",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "e04f0b09-c7e1-58bd-ab83-e0f7e166a838",
+      "name": "Create line",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2080,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "you@yourmail.com",
+        "subject": "={{ $('PO ids').all().length }} draft purchase order(s) to approve",
+        "emailType": "html",
+        "message": "=<p>New draft purchase orders: <b>{{ $('PO ids').all().map(p => p.json.po_no).join(', ') }}</b>.</p>\n<p>Open Airtable → Purchase Orders, check the lines, and click <b>Approve & send</b>.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "546f13a3-628e-520d-b643-355a0a98cf52",
+      "name": "Tell the owner",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2340,
+        0
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": null,
+          "name": "Gmail account"
+        }
+      },
+      "executeOnce": true
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Last PO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Last PO": {
+      "main": [
+        [
+          {
+            "node": "Low stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Low stock": {
+      "main": [
+        [
+          {
+            "node": "Prepare",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare": {
+      "main": [
+        [
+          {
+            "node": "One per supplier",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One per supplier": {
+      "main": [
+        [
+          {
+            "node": "Create PO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create PO": {
+      "main": [
+        [
+          {
+            "node": "PO ids",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PO ids": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Create line",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create line": {
+      "main": [
+        [
+          {
+            "node": "Tell the owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}

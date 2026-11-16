@@ -1,0 +1,485 @@
+{
+  "name": "W10 · Inventory · Stock count",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W10 · Stock count\nThe person counting types what is on the shelf. W10 works out the difference and adds an Adjustment movement if it is not 0.\n\n**Test:** Household → Bar Soap 1kg → 28 (was 30).",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "67b50b29-6da2-5195-8810-d01a165cdde0",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Stock count",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Category",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Staples"
+                  },
+                  {
+                    "option": "Cooking Oil"
+                  },
+                  {
+                    "option": "Dairy"
+                  },
+                  {
+                    "option": "Beverages"
+                  },
+                  {
+                    "option": "Household"
+                  },
+                  {
+                    "option": "Personal Care"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bebec120-291c-57f6-a3be-1a0e4636e51c",
+      "name": "Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "a432a6f5-80c2-56a6-be71-b7e0486af801"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblh1ZhFAkRLKwQWE",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblh1ZhFAkRLKwQWE"
+        },
+        "filterByFormula": "=AND({Category} = '{{ $json.Category }}', {Active})",
+        "sort": {
+          "property": [
+            {
+              "field": "Name",
+              "direction": "asc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4a91aa6b-a090-5f77-b7d1-6dcd4136eb55",
+      "name": "Products",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "products",
+        "options": {}
+      },
+      "id": "706dbbfb-45e5-5e81-ac60-966874df2699",
+      "name": "One list",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{ JSON.stringify([\n  { \"fieldLabel\": \"Product\", \"fieldType\": \"dropdown\", \"requiredField\": true,\n    \"fieldOptions\": { \"values\": $json.products.map(p => ({ \"option\": p.Name })) } },\n  { \"fieldLabel\": \"Counted\", \"fieldType\": \"number\", \"requiredField\": true }\n]) }}",
+        "options": {}
+      },
+      "id": "94bbd9c8-493f-5824-a5cf-d656c14e7302",
+      "name": "Count",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        780,
+        0
+      ],
+      "webhookId": "ba4bed2f-1f82-518f-aac2-3d103ba5db55"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblh1ZhFAkRLKwQWE",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblh1ZhFAkRLKwQWE"
+        },
+        "filterByFormula": "={Name} = '{{ $json.Product }}'",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "id": "39026982-5ec8-5da7-9fae-058e38388cbc",
+      "name": "The product",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "311e7c2c-0e18-5539-8002-1c257935fc30",
+              "name": "difference",
+              "value": "={{ $('Count').first().json.Counted - $json['Stock On Hand'] }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5f30323b-aec4-536c-8e36-52c7bdba4ed7",
+      "name": "Difference",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bf3c21b7-51b7-56b0-b9bd-d56abfd24efd",
+              "leftValue": "={{ $json.difference }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "685e6184-332f-5bc7-9079-c390cb19740c",
+      "name": "Any difference?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLl0rmJNBgSS6t8",
+          "mode": "list",
+          "cachedResultName": "Stock Movements",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblLl0rmJNBgSS6t8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Movement": "=Adjustment · {{ $('The product').first().json.Name }}",
+            "Product": "={{ [ $('The product').first().json.id ] }}",
+            "Type": "Adjustment",
+            "Quantity": "={{ $json.difference }}",
+            "Reference": "=Stock count {{ $now.toFormat('d LLL') }}",
+            "Date": "={{ $now.toFormat('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Movement",
+              "displayName": "Movement",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reference",
+              "displayName": "Reference",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "933aacee-73d6-55b9-901a-a03976e0583e",
+      "name": "Adjust",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1820,
+        -180
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Stock updated",
+        "completionMessage": "={{ $('The product').first().json.Name }} is now {{ $('Count').first().json.Counted }} (changed by {{ $('Difference').first().json.difference }}).",
+        "options": {}
+      },
+      "id": "b0357375-7694-5d3c-b444-d19111672d5d",
+      "name": "Adjusted",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        -180
+      ],
+      "webhookId": "baf6a8c0-a20e-59dd-8320-5d800e015b47"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "No change",
+        "completionMessage": "=No change: {{ $('The product').first().json.Name }} already shows {{ $('Count').first().json.Counted }}.",
+        "options": {}
+      },
+      "id": "4274ee06-5666-55cd-ae7c-8c03560c7b7d",
+      "name": "No change",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        180
+      ],
+      "webhookId": "24fa43c5-a3df-5347-bdac-cb030feffbab"
+    }
+  ],
+  "connections": {
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Products": {
+      "main": [
+        [
+          {
+            "node": "One list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One list": {
+      "main": [
+        [
+          {
+            "node": "Count",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count": {
+      "main": [
+        [
+          {
+            "node": "The product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "The product": {
+      "main": [
+        [
+          {
+            "node": "Difference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Difference": {
+      "main": [
+        [
+          {
+            "node": "Any difference?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any difference?": {
+      "main": [
+        [
+          {
+            "node": "Adjust",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adjust": {
+      "main": [
+        [
+          {
+            "node": "Adjusted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}

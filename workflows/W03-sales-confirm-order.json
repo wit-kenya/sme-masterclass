@@ -1,0 +1,684 @@
+{
+  "name": "W3 · Sales · Confirm order",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W3 · Confirm order\nConfirms a New order only if every line has stock: one Stock Movement (−qty) per line, then Status = Confirmed. Short → stays New. Not New → nothing changes.\n\nStarts from the Airtable **Confirm** button (webhook `confirm-order?order_id=`) or from W1.\n**Test:** pinned Input = SO-1011.",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "52c035d6-ed30-57c8-924e-1fa24d0994f1",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "confirm-order",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "7b3efeab-70a6-55db-89a4-a5fd241c889d",
+      "name": "Button",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -180
+      ],
+      "webhookId": "07eeb1ff-dc50-5140-97cf-3ead454d5004"
+    },
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"order_id\": \"rec3Arc8B6wBQglti\"\n}"
+      },
+      "id": "f7b69cba-28ba-50ad-8229-c7321dd94fbf",
+      "name": "Input",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0358222e-6bb3-51e1-be42-c5d7163a59e9",
+              "name": "order_id",
+              "value": "={{ $json.query ? $json.query.order_id : $json.order_id }}",
+              "type": "string"
+            },
+            {
+              "id": "df406f3b-201d-592d-a9bf-1a39c7926c3c",
+              "name": "from_button",
+              "value": "={{ $json.query !== undefined }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "aee548d3-e7b8-5cf0-88fa-aacedfa3e4a3",
+      "name": "Order ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "id": "={{ $json.order_id }}",
+        "options": {}
+      },
+      "id": "706d0a9f-bcc0-567c-9dda-35f6405f2b4d",
+      "name": "Get order",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5e21054d-3338-530f-9d63-8731cd1a1284",
+                    "leftValue": "={{ $json.Status }}",
+                    "rightValue": "New",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Not new"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8752b8d3-ac7d-5f1d-9e8f-79f9c0443d9b",
+                    "leftValue": "={{ $json['Short Lines'] }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Short"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "OK"
+        }
+      },
+      "id": "89a9f703-13de-525d-8ba7-0379998ff109",
+      "name": "Can confirm?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ad85473-d531-5094-99cb-941755104e3c",
+              "name": "message",
+              "value": "={{ $json['Order No'] }} is already {{ $json.Status }}. Nothing changed.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "801286ff-0686-575b-be7a-1fc4d23acb88",
+      "name": "Not new",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d937f8d4-08ae-516d-b0b0-6e63d3da7301",
+              "name": "message",
+              "value": "={{ $json['Order No'] }} stays New: {{ $json['Short Lines'] }} item(s) do not have enough stock.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6d3d1c92-e5d3-5519-90bb-5e3ee8a53713",
+      "name": "Short",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblYV4Yt04j2mczf9",
+          "mode": "list",
+          "cachedResultName": "Sales Order Lines",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblYV4Yt04j2mczf9"
+        },
+        "filterByFormula": "=ARRAYJOIN({Sales Order}) = '{{ $json['Order No'] }}'",
+        "options": {}
+      },
+      "id": "e3792c2f-e7a6-5834-a067-5b8948d2b8e3",
+      "name": "Get lines",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        180
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLl0rmJNBgSS6t8",
+          "mode": "list",
+          "cachedResultName": "Stock Movements",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblLl0rmJNBgSS6t8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Movement": "=Sale {{ $('Get order').first().json['Order No'] }} · {{ $json['Product Name'] }}",
+            "Product": "={{ $json.Product }}",
+            "Type": "Sale",
+            "Quantity": "={{ -$json.Quantity }}",
+            "Reference": "={{ $('Get order').first().json['Order No'] }}",
+            "Date": "={{ $now.toFormat('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Movement",
+              "displayName": "Movement",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reference",
+              "displayName": "Reference",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "07fd9bf7-0c48-50f6-b4a8-e5235dda5b2a",
+      "name": "Stock out",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1300,
+        180
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcfQaZrqLymxHPD",
+          "mode": "list",
+          "cachedResultName": "Sales Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblcfQaZrqLymxHPD"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Get order').first().json.id }}",
+            "Status": "Confirmed"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "96351d13-2e2f-52bf-adea-a3d0af639a03",
+      "name": "Mark confirmed",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1560,
+        180
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c45f488e-a6d1-561b-83f8-6b7204c5aea4",
+              "name": "message",
+              "value": "={{ $('Get order').first().json['Order No'] }} confirmed. Stock updated.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a6d817e9-d0b0-5f81-a6ee-0900ceddd3b8",
+      "name": "Confirmed",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1820,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "56d4e8be-8239-5d78-97e0-55b061020d09",
+              "leftValue": "={{ $('Order ID').first().json.from_button }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "11e45b6d-5eb7-54d6-a458-ecc64301e2fc",
+      "name": "Reply?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2080,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.message }}",
+        "options": {}
+      },
+      "id": "64a3c6a3-b1cd-54dd-b3c3-b8dfb3adaa3b",
+      "name": "Reply",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2340,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Button": {
+      "main": [
+        [
+          {
+            "node": "Order ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input": {
+      "main": [
+        [
+          {
+            "node": "Order ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Order ID": {
+      "main": [
+        [
+          {
+            "node": "Get order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get order": {
+      "main": [
+        [
+          {
+            "node": "Can confirm?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Can confirm?": {
+      "main": [
+        [
+          {
+            "node": "Not new",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Short",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get lines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get lines": {
+      "main": [
+        [
+          {
+            "node": "Stock out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stock out": {
+      "main": [
+        [
+          {
+            "node": "Mark confirmed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark confirmed": {
+      "main": [
+        [
+          {
+            "node": "Confirmed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmed": {
+      "main": [
+        [
+          {
+            "node": "Reply?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Not new": {
+      "main": [
+        [
+          {
+            "node": "Reply?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Short": {
+      "main": [
+        [
+          {
+            "node": "Reply?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply?": {
+      "main": [
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  },
+  "pinData": {
+    "Input": [
+      {
+        "json": {
+          "order_id": "rec3Arc8B6wBQglti"
+        }
+      }
+    ]
+  }
+}

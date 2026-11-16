@@ -1,0 +1,336 @@
+{
+  "name": "W9 · Inventory · Change a price",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W9 · Change a price\nPage 1: category. Page 2: product (with today's price) and the new price. Updates Selling Price; old orders keep their price.\n\n**Test:** Cooking Oil → Cooking Fat 1kg → 360.",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "812bba83-12ea-536a-a721-9963219644eb",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Change a price",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Category",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Staples"
+                  },
+                  {
+                    "option": "Cooking Oil"
+                  },
+                  {
+                    "option": "Dairy"
+                  },
+                  {
+                    "option": "Beverages"
+                  },
+                  {
+                    "option": "Household"
+                  },
+                  {
+                    "option": "Personal Care"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7de8a958-78ca-5d25-993a-9d1dc8a6566c",
+      "name": "Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "2488b97c-d687-51aa-a228-2a4d32630193"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblh1ZhFAkRLKwQWE",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblh1ZhFAkRLKwQWE"
+        },
+        "filterByFormula": "=AND({Category} = '{{ $json.Category }}', {Active})",
+        "sort": {
+          "property": [
+            {
+              "field": "Name",
+              "direction": "asc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "da7711ad-085a-554f-8090-f0a5e33ecd7b",
+      "name": "Products",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "products",
+        "options": {}
+      },
+      "id": "b74c7515-374a-5b57-b99f-926345a661d7",
+      "name": "One list",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{ JSON.stringify([\n  { \"fieldLabel\": \"Product\", \"fieldType\": \"dropdown\", \"requiredField\": true,\n    \"fieldOptions\": { \"values\": $json.products.map(p => ({ \"option\": p.Name + ' · now KES ' + p['Selling Price'] })) } },\n  { \"fieldLabel\": \"New price\", \"fieldType\": \"number\", \"requiredField\": true }\n]) }}",
+        "options": {}
+      },
+      "id": "7968e073-6906-5654-96a8-ca31aad62916",
+      "name": "New price",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        780,
+        0
+      ],
+      "webhookId": "ca5d7e41-b6b1-58d3-b405-7468c354a04d"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblh1ZhFAkRLKwQWE",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblh1ZhFAkRLKwQWE"
+        },
+        "filterByFormula": "={Name} = '{{ $json.Product.split(' · ')[0] }}'",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "id": "35eca270-1f5b-51c2-b69a-288ce9cc347b",
+      "name": "The product",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblh1ZhFAkRLKwQWE",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblh1ZhFAkRLKwQWE"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "Selling Price": "={{ $('New price').first().json['New price'] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Selling Price",
+              "displayName": "Selling Price",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "b59206ef-f01b-514e-8b0c-670782fecb6d",
+      "name": "Update price",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1300,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Price changed",
+        "completionMessage": "={{ $json.Name }}: KES {{ $('The product').first().json['Selling Price'] }} → KES {{ $json['Selling Price'] }}. Old orders keep their price.",
+        "options": {}
+      },
+      "id": "6bf3ea58-2a5a-53bc-8511-11ece731b5df",
+      "name": "Done",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        0
+      ],
+      "webhookId": "929c2e4e-efaa-52c8-b790-2fe2789bf6ae"
+    }
+  ],
+  "connections": {
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Products": {
+      "main": [
+        [
+          {
+            "node": "One list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One list": {
+      "main": [
+        [
+          {
+            "node": "New price",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New price": {
+      "main": [
+        [
+          {
+            "node": "The product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "The product": {
+      "main": [
+        [
+          {
+            "node": "Update price",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update price": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}

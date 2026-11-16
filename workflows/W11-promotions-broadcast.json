@@ -1,0 +1,174 @@
+{
+  "name": "W11 · Promotions · Broadcast",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W11 · Promotion broadcast (session 2)\nEvery day 08:00: if a promotion starts today, email its Message to customers.\n\n**While testing** the Customers filter sends only to you@yourmail.com. Change it to your email. Never broadcast to the demo contacts.",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "6d2baa92-5ac0-5ce0-b29d-742e5aecfe83",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "7e7c5174-2120-5eec-a59c-0dfc95d36749",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblwrjbJY2vwm0JM3",
+          "mode": "list",
+          "cachedResultName": "Promotions",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblwrjbJY2vwm0JM3"
+        },
+        "filterByFormula": "IS_SAME({Start Date}, TODAY(), 'day')",
+        "options": {}
+      },
+      "id": "8c7b11cd-62f4-59f7-89f7-d8638fc45060",
+      "name": "Starting today",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblkQrQ2tI528GCQH",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblkQrQ2tI528GCQH"
+        },
+        "filterByFormula": "{Email} = 'you@yourmail.com'",
+        "options": {}
+      },
+      "id": "86c0337a-2aad-53ea-944e-a3ccc692ad12",
+      "name": "Customers",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "={{ $('Starting today').first().json.Name }}",
+        "emailType": "text",
+        "message": "=Hi {{ $json.Name }},\n\n{{ $('Starting today').first().json.Message }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "f596fed4-d21c-55a2-945a-7e4eb3c723bf",
+      "name": "Send",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        780,
+        0
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": null,
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Starting today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Starting today": {
+      "main": [
+        [
+          {
+            "node": "Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customers": {
+      "main": [
+        [
+          {
+            "node": "Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}

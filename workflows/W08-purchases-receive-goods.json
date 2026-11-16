@@ -1,0 +1,489 @@
+{
+  "name": "W8 · Purchases · Receive goods",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W8 · Receive goods\nAirtable button **Mark received** on a Sent PO → one Stock Movement (+qty) per line → Status = Received.\n\n**Test URL:** `/webhook-test/receive-po?po_id=recbaC3XuS0ZKMPbg` (PO-2003): Butter 0 → 30, UHT Milk 66 → 162.",
+        "height": 220,
+        "width": 520,
+        "color": 7
+      },
+      "id": "5c113613-5ee3-54b8-a96d-ca7ce3e5f8de",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "receive-po",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f0461bc8-cec3-5aae-af9d-decf0c6eb417",
+      "name": "Button",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "b94003e4-bd6b-5370-a561-ee2b37ec912d"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliSyMvnUzRPNUI8",
+          "mode": "list",
+          "cachedResultName": "Purchase Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tbliSyMvnUzRPNUI8"
+        },
+        "id": "={{ $json.query.po_id }}",
+        "options": {}
+      },
+      "id": "a265ebac-1cfd-5b2b-9b58-a1124ec5a369",
+      "name": "Get PO",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "698ea350-c48b-5a93-b092-52fb7b40f4b4",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Sent",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d06c96dc-2b93-5d68-8585-278d8b135def",
+      "name": "Is it Sent?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c14cefc2-f391-5a27-8cb8-26acb9fec591",
+              "name": "message",
+              "value": "={{ $json['PO No'] }} is {{ $json.Status }}. Only Sent orders can be received.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3442e157-0fce-5612-9b4a-159d3226d877",
+      "name": "Not sent",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        780,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltleDjW1hFDq3Eq",
+          "mode": "list",
+          "cachedResultName": "Purchase Order Lines",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tbltleDjW1hFDq3Eq"
+        },
+        "filterByFormula": "=ARRAYJOIN({Purchase Order}) = '{{ $json['PO No'] }}'",
+        "options": {}
+      },
+      "id": "18cab5e9-6394-5498-870e-13f8469d1fd2",
+      "name": "PO lines",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        780,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLl0rmJNBgSS6t8",
+          "mode": "list",
+          "cachedResultName": "Stock Movements",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tblLl0rmJNBgSS6t8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Movement": "=Purchase {{ $('Get PO').first().json['PO No'] }} · {{ $json['Product Name'] }}",
+            "Product": "={{ $json.Product }}",
+            "Type": "Purchase",
+            "Quantity": "={{ $json.Quantity }}",
+            "Reference": "={{ $('Get PO').first().json['PO No'] }}",
+            "Date": "={{ $now.toFormat('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Movement",
+              "displayName": "Movement",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reference",
+              "displayName": "Reference",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "0d835e33-78a5-5397-96db-b07add3ca296",
+      "name": "Stock in",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appAwRKB9l1c8uisi",
+          "mode": "list",
+          "cachedResultName": "Live Build Demo",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliSyMvnUzRPNUI8",
+          "mode": "list",
+          "cachedResultName": "Purchase Orders",
+          "cachedResultUrl": "https://airtable.com/appAwRKB9l1c8uisi/tbliSyMvnUzRPNUI8"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Get PO').first().json.id }}",
+            "Status": "Received"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "id": "dfa2a52b-f83d-5801-ad7d-4104b5bb242d",
+      "name": "Mark received",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1300,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": null,
+          "name": "Airtable account"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a6fd25b0-70d3-51c1-bd95-9decce524f25",
+              "name": "message",
+              "value": "={{ $('Get PO').first().json['PO No'] }} received. {{ $('PO lines').all().length }} products added to stock.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bfa0fd88-20dc-5650-b69b-748b029837a4",
+      "name": "Received",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.message }}",
+        "options": {}
+      },
+      "id": "083c9313-69b9-57ff-be0f-7050a4850d97",
+      "name": "Reply",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1820,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Button": {
+      "main": [
+        [
+          {
+            "node": "Get PO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get PO": {
+      "main": [
+        [
+          {
+            "node": "Is it Sent?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is it Sent?": {
+      "main": [
+        [
+          {
+            "node": "PO lines",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PO lines": {
+      "main": [
+        [
+          {
+            "node": "Stock in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stock in": {
+      "main": [
+        [
+          {
+            "node": "Mark received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark received": {
+      "main": [
+        [
+          {
+            "node": "Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Received": {
+      "main": [
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Not sent": {
+      "main": [
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Africa/Nairobi"
+  }
+}
