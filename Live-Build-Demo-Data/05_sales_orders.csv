@@ -1,0 +1,12 @@
+Order No,Customer,Order Date,Channel,Status,Notes
+SO-1001,Mama Wanjiku Kiosk,2026-10-02,WhatsApp,Delivered,"Habari! Naomba unga wa ugali 2kg pcs 24, sukari 1kg 20 na chumvi 12. Asante."
+SO-1002,Sunrise Hotel & Restaurant,2026-10-04,Email,Delivered,"Good morning, please supply 6 bags of Pishori rice 5kg, 4 x 3L cooking oil, 10 wheat flour 2kg and 5 packets of tea leaves. Deliver by Monday. Regards, Kitchen Manager."
+SO-1003,Baraka Mini Mart,2026-10-08,WhatsApp,Delivered,"Niletee cooking oil 1L dozen moja, bar soap 10, sabuni ya unga 10 na bathing soap 24 tafadhali."
+SO-1004,Otieno Family,2026-10-11,Walk-in,Delivered,Walk-in purchase at the counter.
+SO-1005,Upendo Supermarket,2026-10-15,WhatsApp,Delivered,"Hi, restock: maize flour 40, wheat flour 20, long grain rice 2kg x15, rosecoco beans 20, butter 10. Will pay part now, balance Friday."
+SO-1006,Kahawa Corner Café,2026-10-19,Chatbot,Delivered,"Chatbot order: 48 UHT milk 500ml, 10 sugar 1kg, 4 tea leaves 500g, 6 butter 250g."
+SO-1007,Mama Akinyi Eatery,2026-10-22,WhatsApp,Delivered,"Nataka 3L oil 6, rice 2kg 10, ndengu 8, chumvi 6 na cooking fat 5. Nitalipa kidogo kidogo."
+SO-1008,Mwalimu Duka,2026-10-26,WhatsApp,Confirmed,"Nimeona offer ya sukari! Sukari 1kg 30, 2kg 10, unga 20 na oil 1L 6."
+SO-1009,Jane Muthoni,2026-10-28,Email,Cancelled,"Hello, I'd like 2 butter 250g and 1 Pishori 5kg delivered to Kilimani. (Cancelled by customer: butter was out of stock.)"
+SO-1010,Mama Wanjiku Kiosk,2026-10-29,WhatsApp,Confirmed,"Sasa! Unga 24 kama last time, sukari 24, 3L oil 3 na bathing soap 12."
+SO-1011,Ahmed Hassan,2026-10-30,Chatbot,New,"Hi, can I get 1 Pishori 5kg, 2 sugar 2kg and 2 cooking oil 1L? Deliver to Eastleigh."

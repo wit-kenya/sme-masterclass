@@ -1,0 +1,43 @@
+Line,Sales Order,Product,Quantity,Unit Price,Discount %
+SO-1001 · Maize Flour 2kg,SO-1001,Maize Flour 2kg,24,175,5%
+SO-1001 · Sugar 1kg,SO-1001,Sugar 1kg,20,175,0%
+SO-1001 · Table Salt 1kg,SO-1001,Table Salt 1kg,12,55,0%
+SO-1002 · Rice Pishori 5kg,SO-1002,Rice Pishori 5kg,6,1050,0%
+SO-1002 · Cooking Oil 3L,SO-1002,Cooking Oil 3L,4,920,0%
+SO-1002 · Wheat Flour 2kg,SO-1002,Wheat Flour 2kg,10,200,5%
+SO-1002 · Tea Leaves 500g,SO-1002,Tea Leaves 500g,5,270,0%
+SO-1003 · Cooking Oil 1L,SO-1003,Cooking Oil 1L,12,300,0%
+SO-1003 · Bar Soap 1kg,SO-1003,Bar Soap 1kg,10,225,0%
+SO-1003 · Washing Powder 1kg,SO-1003,Washing Powder 1kg,10,300,0%
+SO-1003 · Bathing Soap 175g,SO-1003,Bathing Soap 175g,24,95,0%
+SO-1004 · Maize Flour 2kg,SO-1004,Maize Flour 2kg,2,175,0%
+SO-1004 · Sugar 2kg,SO-1004,Sugar 2kg,1,340,0%
+SO-1004 · UHT Milk 500ml,SO-1004,UHT Milk 500ml,6,65,0%
+SO-1004 · Bathing Soap 175g,SO-1004,Bathing Soap 175g,3,95,0%
+SO-1005 · Maize Flour 2kg,SO-1005,Maize Flour 2kg,40,175,0%
+SO-1005 · Wheat Flour 2kg,SO-1005,Wheat Flour 2kg,20,200,0%
+SO-1005 · Rice Long Grain 2kg,SO-1005,Rice Long Grain 2kg,15,330,0%
+SO-1005 · Beans Rosecoco 1kg,SO-1005,Beans Rosecoco 1kg,20,190,0%
+SO-1005 · Butter 250g,SO-1005,Butter 250g,10,340,0%
+SO-1006 · UHT Milk 500ml,SO-1006,UHT Milk 500ml,48,65,0%
+SO-1006 · Sugar 1kg,SO-1006,Sugar 1kg,10,175,0%
+SO-1006 · Tea Leaves 500g,SO-1006,Tea Leaves 500g,4,270,0%
+SO-1006 · Butter 250g,SO-1006,Butter 250g,6,340,0%
+SO-1007 · Cooking Oil 3L,SO-1007,Cooking Oil 3L,6,920,0%
+SO-1007 · Rice Long Grain 2kg,SO-1007,Rice Long Grain 2kg,10,330,0%
+SO-1007 · Green Grams 1kg,SO-1007,Green Grams 1kg,8,220,0%
+SO-1007 · Table Salt 1kg,SO-1007,Table Salt 1kg,6,55,0%
+SO-1007 · Cooking Fat 1kg,SO-1007,Cooking Fat 1kg,5,345,0%
+SO-1008 · Sugar 1kg,SO-1008,Sugar 1kg,30,175,10%
+SO-1008 · Sugar 2kg,SO-1008,Sugar 2kg,10,340,10%
+SO-1008 · Maize Flour 2kg,SO-1008,Maize Flour 2kg,20,175,0%
+SO-1008 · Cooking Oil 1L,SO-1008,Cooking Oil 1L,6,320,0%
+SO-1009 · Butter 250g,SO-1009,Butter 250g,2,340,0%
+SO-1009 · Rice Pishori 5kg,SO-1009,Rice Pishori 5kg,1,1050,0%
+SO-1010 · Sugar 1kg,SO-1010,Sugar 1kg,24,175,10%
+SO-1010 · Maize Flour 2kg,SO-1010,Maize Flour 2kg,24,175,0%
+SO-1010 · Cooking Oil 3L,SO-1010,Cooking Oil 3L,3,920,0%
+SO-1010 · Bathing Soap 175g,SO-1010,Bathing Soap 175g,12,95,0%
+SO-1011 · Rice Pishori 5kg,SO-1011,Rice Pishori 5kg,1,1050,0%
+SO-1011 · Sugar 2kg,SO-1011,Sugar 2kg,2,340,10%
+SO-1011 · Cooking Oil 1L,SO-1011,Cooking Oil 1L,2,320,0%

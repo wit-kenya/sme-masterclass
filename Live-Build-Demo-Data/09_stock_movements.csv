@@ -1,0 +1,63 @@
+Movement,Product,Type,Quantity,Reference,Date
+Opening · Maize Flour 2kg,Maize Flour 2kg,Opening,120,Opening count,2026-10-01
+Opening · Wheat Flour 2kg,Wheat Flour 2kg,Opening,40,Opening count,2026-10-01
+Opening · Rice Pishori 5kg,Rice Pishori 5kg,Opening,18,Opening count,2026-10-01
+Opening · Rice Long Grain 2kg,Rice Long Grain 2kg,Opening,50,Opening count,2026-10-01
+Opening · Beans Rosecoco 1kg,Beans Rosecoco 1kg,Opening,45,Opening count,2026-10-01
+Opening · Green Grams 1kg,Green Grams 1kg,Opening,30,Opening count,2026-10-01
+Opening · Sugar 1kg,Sugar 1kg,Opening,30,Opening count,2026-10-01
+Opening · Sugar 2kg,Sugar 2kg,Opening,20,Opening count,2026-10-01
+Opening · Table Salt 1kg,Table Salt 1kg,Opening,60,Opening count,2026-10-01
+Opening · Cooking Oil 1L,Cooking Oil 1L,Opening,45,Opening count,2026-10-01
+Opening · Cooking Oil 3L,Cooking Oil 3L,Opening,20,Opening count,2026-10-01
+Opening · Cooking Fat 1kg,Cooking Fat 1kg,Opening,25,Opening count,2026-10-01
+Opening · UHT Milk 500ml,UHT Milk 500ml,Opening,120,Opening count,2026-10-01
+Opening · Butter 250g,Butter 250g,Opening,18,Opening count,2026-10-01
+Opening · Tea Leaves 500g,Tea Leaves 500g,Opening,35,Opening count,2026-10-01
+Opening · Drinking Chocolate 200g,Drinking Chocolate 200g,Opening,6,Opening count,2026-10-01
+Opening · Bar Soap 1kg,Bar Soap 1kg,Opening,40,Opening count,2026-10-01
+Opening · Washing Powder 1kg,Washing Powder 1kg,Opening,30,Opening count,2026-10-01
+Opening · Toothpaste 100ml,Toothpaste 100ml,Opening,36,Opening count,2026-10-01
+Opening · Bathing Soap 175g,Bathing Soap 175g,Opening,72,Opening count,2026-10-01
+Sale SO-1001 · Maize Flour 2kg,Maize Flour 2kg,Sale,-24,SO-1001,2026-10-02
+Sale SO-1001 · Sugar 1kg,Sugar 1kg,Sale,-20,SO-1001,2026-10-02
+Sale SO-1001 · Table Salt 1kg,Table Salt 1kg,Sale,-12,SO-1001,2026-10-02
+Sale SO-1002 · Rice Pishori 5kg,Rice Pishori 5kg,Sale,-6,SO-1002,2026-10-04
+Sale SO-1002 · Cooking Oil 3L,Cooking Oil 3L,Sale,-4,SO-1002,2026-10-04
+Sale SO-1002 · Wheat Flour 2kg,Wheat Flour 2kg,Sale,-10,SO-1002,2026-10-04
+Sale SO-1002 · Tea Leaves 500g,Tea Leaves 500g,Sale,-5,SO-1002,2026-10-04
+Purchase PO-2001 · Maize Flour 2kg,Maize Flour 2kg,Purchase,100,PO-2001,2026-10-06
+Purchase PO-2001 · Wheat Flour 2kg,Wheat Flour 2kg,Purchase,50,PO-2001,2026-10-06
+Sale SO-1003 · Cooking Oil 1L,Cooking Oil 1L,Sale,-12,SO-1003,2026-10-08
+Sale SO-1003 · Bar Soap 1kg,Bar Soap 1kg,Sale,-10,SO-1003,2026-10-08
+Sale SO-1003 · Washing Powder 1kg,Washing Powder 1kg,Sale,-10,SO-1003,2026-10-08
+Sale SO-1003 · Bathing Soap 175g,Bathing Soap 175g,Sale,-24,SO-1003,2026-10-08
+Sale SO-1004 · Maize Flour 2kg,Maize Flour 2kg,Sale,-2,SO-1004,2026-10-11
+Sale SO-1004 · Sugar 2kg,Sugar 2kg,Sale,-1,SO-1004,2026-10-11
+Sale SO-1004 · UHT Milk 500ml,UHT Milk 500ml,Sale,-6,SO-1004,2026-10-11
+Sale SO-1004 · Bathing Soap 175g,Bathing Soap 175g,Sale,-3,SO-1004,2026-10-11
+Purchase PO-2002 · Sugar 1kg,Sugar 1kg,Purchase,100,PO-2002,2026-10-15
+Purchase PO-2002 · Sugar 2kg,Sugar 2kg,Purchase,40,PO-2002,2026-10-15
+Sale SO-1005 · Maize Flour 2kg,Maize Flour 2kg,Sale,-40,SO-1005,2026-10-15
+Sale SO-1005 · Wheat Flour 2kg,Wheat Flour 2kg,Sale,-20,SO-1005,2026-10-15
+Sale SO-1005 · Rice Long Grain 2kg,Rice Long Grain 2kg,Sale,-15,SO-1005,2026-10-15
+Sale SO-1005 · Beans Rosecoco 1kg,Beans Rosecoco 1kg,Sale,-20,SO-1005,2026-10-15
+Sale SO-1005 · Butter 250g,Butter 250g,Sale,-10,SO-1005,2026-10-15
+Sale SO-1006 · UHT Milk 500ml,UHT Milk 500ml,Sale,-48,SO-1006,2026-10-19
+Sale SO-1006 · Sugar 1kg,Sugar 1kg,Sale,-10,SO-1006,2026-10-19
+Sale SO-1006 · Tea Leaves 500g,Tea Leaves 500g,Sale,-4,SO-1006,2026-10-19
+Sale SO-1006 · Butter 250g,Butter 250g,Sale,-6,SO-1006,2026-10-19
+Sale SO-1007 · Cooking Oil 3L,Cooking Oil 3L,Sale,-6,SO-1007,2026-10-22
+Sale SO-1007 · Rice Long Grain 2kg,Rice Long Grain 2kg,Sale,-10,SO-1007,2026-10-22
+Sale SO-1007 · Green Grams 1kg,Green Grams 1kg,Sale,-8,SO-1007,2026-10-22
+Sale SO-1007 · Table Salt 1kg,Table Salt 1kg,Sale,-6,SO-1007,2026-10-22
+Sale SO-1007 · Cooking Fat 1kg,Cooking Fat 1kg,Sale,-5,SO-1007,2026-10-22
+Sale SO-1008 · Sugar 1kg,Sugar 1kg,Sale,-30,SO-1008,2026-10-26
+Sale SO-1008 · Sugar 2kg,Sugar 2kg,Sale,-10,SO-1008,2026-10-26
+Sale SO-1008 · Maize Flour 2kg,Maize Flour 2kg,Sale,-20,SO-1008,2026-10-26
+Sale SO-1008 · Cooking Oil 1L,Cooking Oil 1L,Sale,-6,SO-1008,2026-10-26
+Adjustment · Butter 250g,Butter 250g,Adjustment,-2,Spoiled: fridge failure,2026-10-27
+Sale SO-1010 · Sugar 1kg,Sugar 1kg,Sale,-24,SO-1010,2026-10-29
+Sale SO-1010 · Maize Flour 2kg,Maize Flour 2kg,Sale,-24,SO-1010,2026-10-29
+Sale SO-1010 · Cooking Oil 3L,Cooking Oil 3L,Sale,-3,SO-1010,2026-10-29
+Sale SO-1010 · Bathing Soap 175g,Bathing Soap 175g,Sale,-12,SO-1010,2026-10-29

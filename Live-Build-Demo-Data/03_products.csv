@@ -1,0 +1,21 @@
+Name,SKU,Category,Cost Price,Selling Price,Reorder Level,Supplier,Active
+Maize Flour 2kg,STP-MZF2,Staples,150,175,40,Rift Valley Millers,checked
+Wheat Flour 2kg,STP-WHF2,Staples,170,200,30,Rift Valley Millers,checked
+Rice Pishori 5kg,STP-RPS5,Staples,900,1050,10,Lakeside Rice Traders,checked
+Rice Long Grain 2kg,STP-RLG2,Staples,280,330,15,Lakeside Rice Traders,checked
+Beans Rosecoco 1kg,STP-BNS1,Staples,160,190,20,Kilimo Pulses & Grains,checked
+Green Grams 1kg,STP-GGR1,Staples,180,220,15,Kilimo Pulses & Grains,checked
+Sugar 1kg,STP-SUG1,Staples,150,175,50,Greenbelt Sugar Supplies,checked
+Sugar 2kg,STP-SUG2,Staples,295,340,30,Greenbelt Sugar Supplies,checked
+Table Salt 1kg,STP-SLT1,Staples,40,55,30,Bahari Salt & Spices,checked
+Cooking Oil 1L,OIL-1L,Cooking Oil,280,320,20,Coastline Edible Oils,checked
+Cooking Oil 3L,OIL-3L,Cooking Oil,800,920,12,Coastline Edible Oils,checked
+Cooking Fat 1kg,OIL-FAT1,Cooking Oil,300,345,15,Coastline Edible Oils,checked
+UHT Milk 500ml,DRY-UHT500,Dairy,55,65,48,Highland Dairy Co-op,checked
+Butter 250g,DRY-BTR250,Dairy,290,340,10,Highland Dairy Co-op,checked
+Tea Leaves 500g,BEV-TEA500,Beverages,230,270,15,Tumaini Tea & Beverages,checked
+Drinking Chocolate 200g,BEV-CHC200,Beverages,260,310,0,Tumaini Tea & Beverages,
+Bar Soap 1kg,HSE-BSP1,Household,190,225,20,Mwangaza Home Care,checked
+Washing Powder 1kg,HSE-WSH1,Household,260,300,15,Mwangaza Home Care,checked
+Toothpaste 100ml,PRC-TP100,Personal Care,140,170,12,Neema Personal Care,checked
+Bathing Soap 175g,PRC-BTH175,Personal Care,75,95,24,Neema Personal Care,checked

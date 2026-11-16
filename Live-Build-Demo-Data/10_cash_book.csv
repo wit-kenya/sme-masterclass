@@ -1,0 +1,17 @@
+Description,Date,Direction,Category,Amount,Method,Reference,Sales Order,Purchase Order
+October rent,2026-10-01,Out,Rent,12000,Bank,EFT687083,,
+Payment for SO-1001,2026-10-02,In,Sales,8150,M-Pesa,TJA6H1KCJH,SO-1001,
+Payment for PO-2001,2026-10-06,Out,Purchases,23500,Bank,EFT407624,,PO-2001
+Payment for SO-1002,2026-10-07,In,Sales,13230,Bank,EFT661210,SO-1002,
+Payment for SO-1003,2026-10-08,In,Sales,11130,M-Pesa,TJQJKCDJQ4,SO-1003,
+Delivery fuel (9 Oct),2026-10-09,Out,Transport,1500,Cash,,,
+Payment for SO-1004,2026-10-11,In,Sales,1365,Cash,,SO-1004,
+Electricity bill,2026-10-12,Out,Utilities,2800,M-Pesa,TJUFMNBZG1,,
+Part-payment 1 for SO-1005,2026-10-15,In,Sales,15000,M-Pesa,TJ92PFHB1X,SO-1005,
+Part-payment 1 for PO-2002,2026-10-15,Out,Purchases,20000,M-Pesa,TJX16WPGVM,,PO-2002
+Payment for SO-1006,2026-10-20,In,Sales,7990,M-Pesa,TJNPX1ZRPP,SO-1006,
+Part-payment 1 for SO-1007,2026-10-22,In,Sales,5000,M-Pesa,TJ2DDMYJPK,SO-1007,
+Delivery fuel (23 Oct),2026-10-23,Out,Transport,1800,M-Pesa,TJUVNH5NX4,,
+Part-payment 2 for SO-1007,2026-10-27,In,Sales,4000,M-Pesa,TJ0BF94PP3,SO-1007,
+Payment for SO-1010,2026-10-29,In,Sales,11880,M-Pesa,TJZNXQ6CSX,SO-1010,
+October salaries,2026-10-30,Out,Salaries,15000,Bank,EFT522506,,
